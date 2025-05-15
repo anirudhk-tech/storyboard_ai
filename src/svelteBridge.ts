@@ -1,6 +1,5 @@
 import { derived, readable } from 'svelte/store';
-import { reduxStore } from './store';
-import type { MainState } from './store';
+import { reduxStore, type MainState } from '$lib/store/store';
 
 export const reduxState = readable<MainState>(reduxStore.getState(), (set) => {
 	const unsubscribe = reduxStore.subscribe(() => {

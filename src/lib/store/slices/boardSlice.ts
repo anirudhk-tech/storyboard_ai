@@ -1,18 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-
-export interface Card {
-	id: string;
-	content: string;
-}
+import { type StoryCard } from '$lib/types/storyCard';
 
 export interface BoardSlice {
-	cards: Card[];
-	demo: string;
+	cards: StoryCard[];
 }
 
 const initialState: BoardSlice = {
-	cards: [],
-	demo: 'This is a demo string'
+	cards: []
 };
 
 export const boardSlice = createSlice({
@@ -28,5 +22,5 @@ export const boardSlice = createSlice({
 	}
 });
 
-export const { clearBoard } = boardSlice.actions;
+export const { clearBoard, addCard } = boardSlice.actions;
 export default boardSlice.reducer;
