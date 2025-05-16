@@ -2,7 +2,7 @@
 	import { boardStore } from '../../svelteBridge';
 	import { line, curveCatmullRom } from 'd3-shape';
 	import { type StoryCard } from '$lib/types/storyCard';
-	import { CARD_HEIGHT, CARD_WIDTH } from '$lib';
+	import { DEFAULT_CARD_HEIGHT, DEFAULT_CARD_WIDTH } from '$lib';
 
 	$: boardWidth = $boardStore.boardSize?.width;
 	$: boardHeight = $boardStore.boardSize?.height;
@@ -10,11 +10,11 @@
 	$: stack = $boardStore.addedIdsStack;
 	$: orderedCards = stack
 		.map((id) => cards.find((card) => card.id === id))
-		.filter((c): c is StoryCard => c !== undefined && !c?.suggestion);
+		.filter((c): c is StoryCard => !!c);
 
 	const makeConnector = line<StoryCard>()
-		.x((d) => d.pos.x + CARD_WIDTH / 2)
-		.y((d) => d.pos.y + CARD_HEIGHT / 2)
+		.x((d) => d.pos.x + DEFAULT_CARD_WIDTH / 2)
+		.y((d) => d.pos.y + d.height / 2)
 		.curve(curveCatmullRom.alpha(0.5));
 
 	$: connectorPath = orderedCards.length > 1 ? makeConnector(orderedCards) : '';

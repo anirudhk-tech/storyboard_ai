@@ -1,40 +1,83 @@
 <script lang="ts">
+	import { zoom, zoomIdentity, type ZoomBehavior } from 'd3-zoom';
+	import { select } from 'd3-selection';
+	import { onMount } from 'svelte';
+	import { boardStore } from '../svelteBridge';
 	import StoryCard from '$lib/components/StoryCard.svelte';
 	import StoryCardConnector from '$lib/components/StoryCardConnector.svelte';
-	import { addCardToBoard, resizeBoard } from '$lib/services/boardServices';
-	import { type StoryCardPosition } from '$lib/types/storyCard';
-	import { boardStore } from '../svelteBridge';
+	import { addCardToBoard } from '$lib/services/boardServices';
+	import type { StoryCardPosition } from '$lib/types/storyCard';
+
 	$: cards = $boardStore.cards;
-	$: boardWidth = $boardStore.boardSize?.width;
-	$: boardHeight = $boardStore.boardSize?.height;
+	$: boardSize = $boardStore.boardSize ?? { width: 1000, height: 1000 };
 
-	const handleDoubleClick = (event: MouseEvent) => {
-		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-		const x = event.clientX - rect.left - 160;
-		const y = event.clientY - rect.top - 50;
-		const pos: StoryCardPosition = { x, y };
-		addCardToBoard(pos, false);
+	let container: HTMLDivElement;
+	let viewport: HTMLDivElement;
+
+	onMount(() => {
+		const z: ZoomBehavior<HTMLDivElement, unknown> = zoom<HTMLDivElement, unknown>()
+			.filter((e) => {
+				if (e.type === 'dblclick' || (e.target as HTMLElement).closest('.drag-root')) return false;
+				return e.type === 'wheel' || e.type === 'touchmove' || e.type === 'mousedown';
+			})
+			.scaleExtent([0.2, 3])
+			.translateExtent([
+				[-Infinity, -Infinity],
+				[Infinity, Infinity]
+			])
+			.on('zoom', ({ transform }) => {
+				viewport.style.transform = `translate(${transform.x}px,${transform.y}px) scale(${transform.k})`;
+			});
+
+		select(container).style('touch-action', 'none').call(z);
+		select(container).call(z.transform, zoomIdentity);
+	});
+
+	const handleDoubleClick = (e: MouseEvent) => {
+		const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+		addCardToBoard(
+			{ x: e.clientX - rect.left - 160, y: e.clientY - rect.top - 50 } satisfies StoryCardPosition,
+			false
+		);
 	};
-
-	let prevCardCount = 0;
-	$: if (cards.length !== prevCardCount) {
-		prevCardCount = cards.length;
-		resizeBoard();
-	}
 </script>
 
 <div
-	class="relative flex min-h-screen items-center justify-center
-	       overflow-hidden bg-gradient-to-b from-[#0d1b2a] via-[#1b263b]
-	       to-[#000]"
-	style="width: {boardWidth}px; height: {boardHeight}px; min-width:100vw; min-height:100vh"
-	tabindex="0"
+	bind:this={container}
+	class="board-container"
 	on:dblclick={handleDoubleClick}
 	role="button"
-	aria-label="Add new card on double click"
+	tabindex="0"
+	aria-label="Double click to add a card"
 >
-	<StoryCardConnector />
-	{#each cards as card (card.id)}
-		<StoryCard {card} />
-	{/each}
+	<div
+		bind:this={viewport}
+		class="board-viewport"
+		style:width={boardSize.width + 'px'}
+		style:height={boardSize.height + 'px'}
+	>
+		<StoryCardConnector />
+		{#each cards as card (card.id)}
+			<StoryCard {card} />
+		{/each}
+	</div>
 </div>
+
+<style>
+	.board-container {
+		position: relative;
+		width: 100vw;
+		height: 100vh;
+		overflow: hidden;
+		background: #0d1b2a;
+		cursor: grab;
+	}
+
+	.board-viewport {
+		position: absolute;
+		top: 0;
+		left: 0;
+		transform-origin: 0 0;
+		will-change: transform;
+	}
+</style>

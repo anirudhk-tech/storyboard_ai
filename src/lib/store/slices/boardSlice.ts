@@ -41,6 +41,13 @@ export const boardSlice = createSlice({
 				card.pos = pos;
 			}
 		},
+		resizeCardHeight: (state, action) => {
+			const { cardId, height } = action.payload;
+			const card = state.cards.find((card) => card.id === cardId);
+			if (card) {
+				card.height = height;
+			}
+		},
 		changeCardContent: (state, action) => {
 			const { cardId, content } = action.payload;
 			const card = state.cards.find((card) => card.id === cardId);
@@ -86,6 +93,7 @@ export const {
 	removeCard,
 	calcBoardWidth,
 	moveCard,
-	changeSuggestionToCard
+	changeSuggestionToCard,
+	resizeCardHeight
 } = boardSlice.actions;
 export default boardSlice.reducer;

@@ -18,7 +18,7 @@ const config = {
 			keyframes: {
 				float: {
 					'0%, 100%': { transform: 'translateY(0)' },
-					'50%': { transform: 'translateY(-6px)' }
+					'50%': { transform: 'translateY(-2px)' }
 				},
 				drift: {
 					'0%': { transform: 'translateX(-20%)' },

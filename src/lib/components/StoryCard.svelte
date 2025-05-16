@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import {
 		addSuggestionToBoard,
+		changeCardHeight,
 		commitSuggestionToBoard,
 		isSuggestionOnBoard,
 		moveCardOnBoard,
@@ -15,8 +16,9 @@
 	import Pencil from '~icons/lucide/pencil';
 	import Check from '~icons/lucide/check';
 	import Delete from '~icons/lucide/trash-2';
+	import IconRefreshCwSolid from '~icons/heroicons-outline/refresh';
 	import { boardStore } from '../../svelteBridge';
-	import { CARD_HEIGHT, CARD_WIDTH } from '$lib';
+	import { DEFAULT_CARD_WIDTH } from '$lib';
 	export let card: StoryCard;
 
 	let inputEl: HTMLTextAreaElement;
@@ -35,6 +37,7 @@
 		} else {
 			writeInCard(card.id, inputEl.value);
 		}
+		changeCardHeight(card.id, inputEl.scrollHeight);
 	};
 
 	const handleKeyDown = (event: KeyboardEvent) => {
@@ -54,6 +57,11 @@
 
 	const handleDeleteClick = () => {
 		removeCardFromBoard(card.id);
+	};
+
+	const autoResize = () => {
+		inputEl.style.height = 'auto';
+		inputEl.style.height = inputEl.scrollHeight + 'px';
 	};
 </script>
 
@@ -95,7 +103,7 @@
 			}
 		}
 	}}
-	class={`animate-float animate-fade-in absolute z-500 rounded-2xl bg-white/70 shadow-2xl drop-shadow-xl backdrop-blur-md`}
+	class={`drag-root animate-float animate-fade-in absolute z-500 rounded-2xl bg-white/70 shadow-2xl drop-shadow-xl backdrop-blur-md`}
 	style="top: {card.pos.y}px; left: {card.pos.x}px; border: {card.suggestion
 		? '2px dashed red'
 		: 'none'}; border-radius: 12px"
@@ -113,20 +121,22 @@
 			aria-hidden="true"
 		></div>
 	{/if}
-	<Card.Root class="relative" style="width: {CARD_WIDTH}px; height: {CARD_HEIGHT}px">
+	<Card.Root class="relative" style="width: {DEFAULT_CARD_WIDTH}px">
 		{#if card.suggestion}
 			<div
 				class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.05)_1px,transparent_0)] bg-[length:8px_8px]"
 			></div>
 		{/if}
 		<div class="no-drag absolute -top-7 right-0 flex flex-row gap-2">
-			<button
-				on:mousedown|stopPropagation
-				on:mouseup|stopPropagation
-				on:click|stopPropagation={handleDeleteClick}
-			>
-				<Delete class="pointer-events-auto cursor-pointer text-white hover:opacity-70" />
-			</button>
+			{#if !card.suggestion}
+				<button
+					on:mousedown|stopPropagation
+					on:mouseup|stopPropagation
+					on:click|stopPropagation={handleDeleteClick}
+				>
+					<Delete class="pointer-events-auto cursor-pointer text-white hover:opacity-70" />
+				</button>
+			{/if}
 			{#if card.id === mostRecentCardId}
 				<button
 					on:mousedown|stopPropagation
@@ -137,6 +147,15 @@
 				</button>
 			{/if}
 			{#if card.suggestion}
+				<button
+					on:mousedown|stopPropagation
+					on:mouseup|stopPropagation
+					on:click|stopPropagation={handleSuggestClick}
+				>
+					<IconRefreshCwSolid
+						class="pointer-events-auto cursor-pointer text-white hover:opacity-70"
+					/>
+				</button>
 				<button
 					on:mousedown|stopPropagation
 					on:mouseup|stopPropagation
@@ -156,6 +175,7 @@
 				on:blur={handleBlur}
 				on:keydown={handleKeyDown}
 				on:dblclick|stopPropagation
+				on:input={autoResize}
 			>
 			</textarea>
 		</Card.Content>

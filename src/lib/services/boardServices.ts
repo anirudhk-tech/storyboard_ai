@@ -5,21 +5,25 @@ import {
 	changeCardContent,
 	changeSuggestionToCard,
 	moveCard,
-	removeCard
+	removeCard,
+	resizeCardHeight
 } from '$lib/store/slices/boardSlice';
 import { type StoryCard, type StoryCardPosition } from '$lib/types/storyCard';
 import type { SuggestionResponse } from '../../routes/api/suggest/+server';
 import { setSummary } from '$lib/store/slices/aiSlice';
+import { DEFAULT_CARD_HEIGHT } from '$lib';
 
 export const addCardToBoard = (newPos: StoryCardPosition, suggestion: boolean) => {
 	const newCard: StoryCard = {
 		id: crypto.randomUUID(),
 		content: '',
 		pos: newPos,
-		suggestion
+		suggestion,
+		height: DEFAULT_CARD_HEIGHT
 	};
 
 	reduxStore.dispatch(addCard(newCard));
+	resizeBoard();
 };
 
 export const moveCardOnBoard = (cardId: string, newPos: StoryCardPosition) => {
@@ -38,6 +42,7 @@ export const writeInCard = (cardId: string, content: string) => {
 
 export const removeCardFromBoard = (cardId: string) => {
 	reduxStore.dispatch(removeCard({ cardId }));
+	resizeBoard();
 };
 
 export const resizeBoard = () => {
@@ -66,7 +71,8 @@ export const addSuggestionToBoard = async (prevCard: StoryCard) => {
 				x: prevCard.pos.x + 300,
 				y: prevCard.pos.y
 			},
-			suggestion: true
+			suggestion: true,
+			height: DEFAULT_CARD_HEIGHT
 		};
 
 		reduxStore.dispatch(addCard(newCard));
@@ -81,4 +87,8 @@ export const commitSuggestionToBoard = (cardId: string) => {
 
 export const isSuggestionOnBoard = () => {
 	return reduxStore.getState().board.cards.some((card) => card.suggestion);
+};
+
+export const changeCardHeight = (cardId: string, height: number) => {
+	reduxStore.dispatch(resizeCardHeight({ cardId, height }));
 };

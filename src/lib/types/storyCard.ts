@@ -8,4 +8,5 @@ export interface StoryCard {
 	content: string;
 	pos: StoryCardPosition;
 	suggestion: boolean;
+	height: number;
 }
