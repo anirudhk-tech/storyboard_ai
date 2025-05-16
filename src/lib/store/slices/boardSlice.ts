@@ -9,6 +9,7 @@ export interface BoardSize {
 export interface BoardSlice {
 	cards: StoryCard[];
 	boardSize: BoardSize;
+	addedIdsStack: string[];
 }
 
 const initialState: BoardSlice = {
@@ -16,7 +17,8 @@ const initialState: BoardSlice = {
 	boardSize: {
 		width: 0,
 		height: 0
-	}
+	},
+	addedIdsStack: []
 };
 
 export const boardSlice = createSlice({
@@ -25,10 +27,12 @@ export const boardSlice = createSlice({
 	reducers: {
 		addCard: (state, action) => {
 			state.cards.push(action.payload);
+			if (!action.payload.suggestion) state.addedIdsStack.push(action.payload.id);
 		},
 		removeCard: (state, action) => {
 			const { cardId } = action.payload;
 			state.cards = state.cards.filter((card) => card.id !== cardId);
+			state.addedIdsStack = state.addedIdsStack.filter((id) => id !== cardId);
 		},
 		moveCard: (state, action) => {
 			const { cardId, pos } = action.payload;
@@ -46,6 +50,7 @@ export const boardSlice = createSlice({
 		},
 		clearBoard: (state) => {
 			state.cards = [];
+			state.addedIdsStack = [];
 		},
 		calcBoardWidth: (state) => {
 			const rightMostCard = state.cards.reduce((prev, current) => {
@@ -62,10 +67,25 @@ export const boardSlice = createSlice({
 			if (bottomMostCard && state.boardSize) {
 				state.boardSize.height = bottomMostCard.pos.y + 1000;
 			}
+		},
+		changeSuggestionToCard: (state, action) => {
+			const { cardId } = action.payload;
+			const card = state.cards.find((card) => card.id === cardId);
+			if (card) {
+				card.suggestion = false;
+				state.addedIdsStack.push(card.id);
+			}
 		}
 	}
 });
 
-export const { clearBoard, addCard, changeCardContent, removeCard, calcBoardWidth, moveCard } =
-	boardSlice.actions;
+export const {
+	clearBoard,
+	addCard,
+	changeCardContent,
+	removeCard,
+	calcBoardWidth,
+	moveCard,
+	changeSuggestionToCard
+} = boardSlice.actions;
 export default boardSlice.reducer;

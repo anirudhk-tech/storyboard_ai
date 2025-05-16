@@ -2,23 +2,32 @@
 	import * as Card from './ui/card/index';
 	import { type StoryCard } from '$lib/types/storyCard';
 	import { onMount } from 'svelte';
-	import { moveCardOnBoard, removeCardFromBoard, writeInCard } from '$lib/services/boardServices';
+	import {
+		addSuggestionToBoard,
+		commitSuggestionToBoard,
+		isSuggestionOnBoard,
+		moveCardOnBoard,
+		removeCardFromBoard,
+		writeInCard
+	} from '$lib/services/boardServices';
 	import { draggable } from '$lib/actions/draggable';
 	import interact from 'interactjs';
+	import Pencil from '~icons/lucide/pencil';
+	import Check from '~icons/lucide/check';
+	import Delete from '~icons/lucide/trash-2';
+	import { boardStore } from '../../svelteBridge';
+	import { CARD_HEIGHT, CARD_WIDTH } from '$lib';
 	export let card: StoryCard;
 
 	let inputEl: HTMLTextAreaElement;
+
+	$: mostRecentCardId = $boardStore.addedIdsStack[$boardStore.addedIdsStack.length - 1];
 
 	onMount(() => {
 		requestAnimationFrame(() => {
 			inputEl && inputEl.focus();
 		});
 	});
-
-	const autoResize = () => {
-		inputEl.style.height = 'auto';
-		inputEl.style.height = inputEl.scrollHeight + 'px';
-	};
 
 	const handleBlur = () => {
 		if (inputEl.value.trim() === '') {
@@ -34,11 +43,24 @@
 			inputEl.blur();
 		}
 	};
+
+	const handleSuggestClick = () => {
+		addSuggestionToBoard(card);
+	};
+
+	const handleCommitClick = () => {
+		commitSuggestionToBoard(card.id);
+	};
+
+	const handleDeleteClick = () => {
+		removeCardFromBoard(card.id);
+	};
 </script>
 
 <div
 	use:draggable={{
 		inertia: { enabled: true },
+		ignoreFrom: '.no-drag',
 		modifiers: [interact.modifiers.restrictRect({ restriction: 'parent', endOnly: true })],
 		listeners: {
 			start(event) {
@@ -52,23 +74,19 @@
 			},
 			move(event) {
 				const el = event.target as HTMLElement;
+				const startX = parseFloat(el.dataset.startX!) || 0;
+				const startY = parseFloat(el.dataset.startY!) || 0;
 				const x = (parseFloat(el.getAttribute('data-x')!) || 0) + event.dx;
 				const y = (parseFloat(el.getAttribute('data-y')!) || 0) + event.dy;
 
 				el.style.transform = `translate(${x}px, ${y}px)`;
 				el.setAttribute('data-x', x);
 				el.setAttribute('data-y', y);
+
+				moveCardOnBoard(card.id, { x: startX + x, y: startY + y });
 			},
 			end(event) {
 				const el = event.target as HTMLElement;
-
-				const startX = parseFloat(el.dataset.startX!) || 0;
-				const startY = parseFloat(el.dataset.startY!) || 0;
-				const deltaX = parseFloat(el.dataset.x!) || 0;
-				const deltaY = parseFloat(el.dataset.y!) || 0;
-
-				moveCardOnBoard(card.id, { x: startX + deltaX, y: startY + deltaY });
-
 				el.style.transform = '';
 				el.removeAttribute('data-x');
 				el.removeAttribute('data-y');
@@ -78,17 +96,63 @@
 		}
 	}}
 	class={`animate-float animate-fade-in absolute z-500 rounded-2xl bg-white/70 shadow-2xl drop-shadow-xl backdrop-blur-md`}
-	style="top: {card.pos.y}px; left: {card.pos.x}px;"
+	style="top: {card.pos.y}px; left: {card.pos.x}px; border: {card.suggestion
+		? '2px dashed red'
+		: 'none'}; border-radius: 12px"
 >
-	<Card.Root>
+	{#if card.suggestion}
+		<div
+			class="pointer-events-none absolute -inset-[3px]
+			       rounded-[16px]
+			       bg-[conic-gradient(from_180deg_at_50%_50%,#0ea5e9_0deg,#a855f7_120deg,#60a5fa_240deg,#0ea5e9_360deg)] opacity-80 blur-sm transition-opacity
+			       duration-500 group-hover:opacity-100"
+			aria-hidden="true"
+		></div>
+		<div
+			class="pointer-events-none absolute -inset-[1px] rounded-[15px] bg-black/40 blur-lg"
+			aria-hidden="true"
+		></div>
+	{/if}
+	<Card.Root class="relative" style="width: {CARD_WIDTH}px; height: {CARD_HEIGHT}px">
+		{#if card.suggestion}
+			<div
+				class="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.05)_1px,transparent_0)] bg-[length:8px_8px]"
+			></div>
+		{/if}
+		<div class="no-drag absolute -top-7 right-0 flex flex-row gap-2">
+			<button
+				on:mousedown|stopPropagation
+				on:mouseup|stopPropagation
+				on:click|stopPropagation={handleDeleteClick}
+			>
+				<Delete class="pointer-events-auto cursor-pointer text-white hover:opacity-70" />
+			</button>
+			{#if card.id === mostRecentCardId}
+				<button
+					on:mousedown|stopPropagation
+					on:mouseup|stopPropagation
+					on:click|stopPropagation={handleSuggestClick}
+				>
+					<Pencil class="pointer-events-auto cursor-pointer text-white hover:opacity-70" />
+				</button>
+			{/if}
+			{#if card.suggestion}
+				<button
+					on:mousedown|stopPropagation
+					on:mouseup|stopPropagation
+					on:click|stopPropagation={handleCommitClick}
+				>
+					<Check class="pointer-events-auto cursor-pointer text-white hover:opacity-70" />
+				</button>
+			{/if}
+		</div>
 		<Card.Content>
 			<textarea
 				bind:this={inputEl}
 				bind:value={card.content}
 				class="w-full resize-none outline-none focus:outline-none"
 				placeholder="Type your story point..."
-				rows="1"
-				on:input={autoResize}
+				rows="5"
 				on:blur={handleBlur}
 				on:keydown={handleKeyDown}
 				on:dblclick|stopPropagation

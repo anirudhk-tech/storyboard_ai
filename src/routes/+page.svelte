@@ -1,5 +1,6 @@
 <script lang="ts">
 	import StoryCard from '$lib/components/StoryCard.svelte';
+	import StoryCardConnector from '$lib/components/StoryCardConnector.svelte';
 	import { addCardToBoard, resizeBoard } from '$lib/services/boardServices';
 	import { type StoryCardPosition } from '$lib/types/storyCard';
 	import { boardStore } from '../svelteBridge';
@@ -9,10 +10,10 @@
 
 	const handleDoubleClick = (event: MouseEvent) => {
 		const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-		const x = event.clientX - rect.left - 160; // CARD WIDTH is 80px (centers)
-		const y = event.clientY - rect.top - 50; // CARD HEIGHT is about 40px initially (centers)
+		const x = event.clientX - rect.left - 160;
+		const y = event.clientY - rect.top - 50;
 		const pos: StoryCardPosition = { x, y };
-		addCardToBoard(pos);
+		addCardToBoard(pos, false);
 	};
 
 	let prevCardCount = 0;
@@ -23,15 +24,16 @@
 </script>
 
 <div
-	class="relative flex min-h-screen
-        	items-center justify-center
-            bg-gradient-to-b from-sky-200 via-blue-100 to-white"
-	style="width: {boardWidth}px; height: {boardHeight}px; min-height: 100vh; min-width: 100vw"
+	class="relative flex min-h-screen items-center justify-center
+	       overflow-hidden bg-gradient-to-b from-[#0d1b2a] via-[#1b263b]
+	       to-[#000]"
+	style="width: {boardWidth}px; height: {boardHeight}px; min-width:100vw; min-height:100vh"
 	tabindex="0"
 	on:dblclick={handleDoubleClick}
 	role="button"
 	aria-label="Add new card on double click"
 >
+	<StoryCardConnector />
 	{#each cards as card (card.id)}
 		<StoryCard {card} />
 	{/each}
