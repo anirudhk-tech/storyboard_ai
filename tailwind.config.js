@@ -15,6 +15,25 @@ const config = {
 			}
 		},
 		extend: {
+			keyframes: {
+				float: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-6px)' }
+				},
+				drift: {
+					'0%': { transform: 'translateX(-20%)' },
+					'100%': { transform: 'translateX(120%)' }
+				},
+				fadeIn: {
+					'0%': { opacity: '0', transform: 'scale(0.8)' },
+					'100%': { opacity: '1', transform: 'scale(1)' }
+				}
+			},
+			animation: {
+				float: 'float 4s ease-in-out infinite',
+				'drift-slow': 'drift 200s linear infinite',
+				'fade-in': 'fadeIn 300ms ease-out forwards'
+			},
 			colors: {
 				border: 'hsl(var(--border) / <alpha-value>)',
 				input: 'hsl(var(--input) / <alpha-value>)',

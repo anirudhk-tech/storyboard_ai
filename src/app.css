@@ -75,3 +75,25 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+/* Scrollbar track */
+::-webkit-scrollbar {
+	width: 12px;
+	height: 10px;
+}
+
+/* Track background: very light, semi-transparent gradient */
+::-webkit-scrollbar-track {
+	background: linear-gradient(
+		to bottom,
+		rgba(224, 242, 254, 0.6),
+		/* #e0f2fe at 60% opacity */ rgba(255, 255, 255, 0.4) /* fading into white */
+	);
+	border-radius: 8px;
+}
+
+/* Thumb: soft, translucent with a slight blur */
+::-webkit-scrollbar-thumb {
+	background-color: #0b132b;
+	border-radius: 8px;
+}

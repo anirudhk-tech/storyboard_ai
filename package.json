@@ -45,6 +45,7 @@
 	"dependencies": {
 		"@reduxjs/toolkit": "^2.8.2",
 		"@types/node": "^22.15.18",
+		"interactjs": "^1.10.27",
 		"redux": "^5.0.1",
 		"tailwindcss-animate": "^1.0.7"
 	}
