@@ -15,7 +15,10 @@ import { setSummary } from '$lib/store/slices/aiSlice';
 import { DEFAULT_CARD_HEIGHT } from '$lib';
 
 export const loadCards = async () => {
-	const res = await fetch('/api/cards');
+	const boardId = reduxStore.getState().board.boardId;
+	if (!boardId) return;
+
+	const res = await fetch(`/api/cards/${boardId}`);
 	if (!res.ok) {
 		throw new Error('Failed to fetch cards');
 	}
@@ -25,21 +28,36 @@ export const loadCards = async () => {
 };
 
 export const addCardToBoard = async (newPos: StoryCardPosition, suggestion: boolean) => {
-	const res = await fetch('/api/cards', {
-		method: 'POST',
-		body: JSON.stringify({
+	const boardId = reduxStore.getState().board.boardId;
+	if (boardId) {
+		const res = await fetch(`/api/cards/${boardId}`, {
+			method: 'POST',
+			body: JSON.stringify({
+				content: '',
+				height: DEFAULT_CARD_HEIGHT,
+				pos: newPos
+			})
+		});
+
+		if (!res.ok) {
+			throw new Error('Failed to create card');
+		}
+
+		const newCard: StoryCard = await res.json();
+		reduxStore.dispatch(addCard({ suggestion, ...newCard }));
+	} else {
+		const newCard: StoryCard = {
 			content: '',
 			height: DEFAULT_CARD_HEIGHT,
-			pos: newPos
-		})
-	});
+			pos: newPos,
+			suggestion,
+			id: crypto.randomUUID(),
+			createdAt: new Date().toISOString()
+		};
 
-	if (!res.ok) {
-		throw new Error('Failed to create card');
+		reduxStore.dispatch(addCard(newCard));
 	}
 
-	const newCard: StoryCard = await res.json();
-	reduxStore.dispatch(addCard({ suggestion, ...newCard }));
 	resizeBoard();
 };
 
@@ -54,7 +72,10 @@ export const moveCardOnBoardState = (cardId: string, newPos: StoryCardPosition) 
 };
 
 export const moveCardOnBoardFinal = async (card: StoryCard, newPos: StoryCardPosition) => {
-	const res = await fetch(`/api/cards/${card.id}`, {
+	const boardId = reduxStore.getState().board.boardId;
+	if (!boardId) return;
+
+	const res = await fetch(`/api/cards/${boardId}/${card.id}`, {
 		method: 'PUT',
 		body: JSON.stringify({
 			height: card!.height,
@@ -77,34 +98,39 @@ export const moveCardOnBoardFinal = async (card: StoryCard, newPos: StoryCardPos
 };
 
 export const writeInCard = async (card: StoryCard, content: string) => {
-	const res = await fetch(`/api/cards/${card.id}`, {
-		method: 'PUT',
-		body: JSON.stringify({
-			height: card.height,
-			pos: card.pos,
-			content
-		}),
-		headers: {
-			'Content-Type': 'application/json'
-		}
-	});
+	const boardId = reduxStore.getState().board.boardId;
+	if (boardId) {
+		const res = await fetch(`/api/cards/${card.id}/${boardId}`, {
+			method: 'PUT',
+			body: JSON.stringify({
+				height: card.height,
+				pos: card.pos,
+				content
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		});
 
-	if (!res.ok) {
-		throw new Error('Failed to move card');
+		if (!res.ok) {
+			throw new Error('Failed to move card');
+		}
 	}
 
 	reduxStore.dispatch(changeCardContent({ cardId: card.id, content }));
 };
 
 export const removeCardFromBoard = (cardId: string) => {
-	const res = fetch(`/api/cards/${cardId}`, {
-		method: 'DELETE'
-	});
+	const boardId = reduxStore.getState().board.boardId;
+	if (boardId) {
+		const res = fetch(`/api/cards/${cardId}/${boardId}`, {
+			method: 'DELETE'
+		});
 
-	if (!res) {
-		throw new Error('Failed to delete card');
+		if (!res) {
+			throw new Error('Failed to delete card');
+		}
 	}
-
 	reduxStore.dispatch(removeCard({ cardId }));
 	resizeBoard();
 };
@@ -147,6 +173,9 @@ export const addSuggestionToBoard = async (prevCard: StoryCard) => {
 };
 
 export const commitSuggestionToBoard = async (card: StoryCard) => {
+	const boardId = reduxStore.getState().board.boardId;
+	if (!boardId) return;
+
 	const res = await fetch('/api/cards', {
 		method: 'POST',
 		body: JSON.stringify({
@@ -167,17 +196,20 @@ export const isSuggestionOnBoard = () => {
 };
 
 export const changeCardHeight = async (card: StoryCard, height: number) => {
-	const res = await fetch(`/api/cards/${card.id}`, {
-		method: 'PUT',
-		body: JSON.stringify({
-			height: height,
-			pos: card.pos,
-			content: card.content
-		})
-	});
+	const boardId = reduxStore.getState().board.boardId;
+	if (boardId) {
+		const res = await fetch(`/api/cards/${card.id}`, {
+			method: 'PUT',
+			body: JSON.stringify({
+				height: height,
+				pos: card.pos,
+				content: card.content
+			})
+		});
 
-	if (!res.ok) {
-		throw new Error('Failed to move card');
+		if (!res.ok) {
+			throw new Error('Failed to move card');
+		}
 	}
 
 	reduxStore.dispatch(resizeCardHeight({ cardId: card.id, height }));

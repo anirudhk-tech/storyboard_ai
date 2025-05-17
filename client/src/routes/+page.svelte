@@ -7,10 +7,13 @@
 	import StoryCardConnector from '$lib/components/StoryCardConnector.svelte';
 	import { addCardToBoard, loadCards } from '$lib/services/boardServices';
 	import type { StoryCardPosition } from '../lib/types/storyCard'
+	import SaveIcon from '~icons/mdi/content-save-outline';
+	import { toggleSaveDialog } from '$lib/services/dialogServices';
+	import SaveDialog from '$lib/components/SaveDialog.svelte';
 
 	$: cards = $boardStore.cards;
 	$: boardSize = $boardStore.boardSize ?? { width: 1000, height: 1000 };
-
+	
 	let container: HTMLDivElement;
 	let viewport: HTMLDivElement;
 
@@ -41,6 +44,8 @@
 			false
 		);
 	};
+
+	const handleSaveButtonClick = () => toggleSaveDialog(true);
 </script>
 
 <div
@@ -63,6 +68,13 @@
 		{/each}
 	</div>
 </div>
+<SaveDialog/>
+<button
+class="absolute top-4 right-4 z-50 p-2 bg-white rounded-md hover:opacity-70"
+on:click={handleSaveButtonClick}
+>
+	<SaveIcon class="w-6 h-6" />
+</button>
 
 <style>
 	.board-container {

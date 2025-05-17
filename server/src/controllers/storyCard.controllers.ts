@@ -3,12 +3,13 @@ import * as services from "../services/storyCard.services";
 import { StoryCard } from "../models/storyCard.model";
 
 export const listCards = async (
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
-    const cards: StoryCard[] = await services.getAllCards();
+    const boardId = req.params.boardId;
+    const cards: StoryCard[] = await services.getAllCards(boardId);
 
     const formattedCards: {
       content: string;
@@ -16,12 +17,14 @@ export const listCards = async (
       height: number;
       id: string;
       createdAt: string;
+      boardId: string;
     }[] = cards.map((card) => ({
       content: card.content,
       pos: { x: card.pos_x, y: card.pos_y },
       height: card.height,
       id: card.id,
       createdAt: card.created_at,
+      boardId: card.board_id,
     }));
 
     res.json(formattedCards);
@@ -54,11 +57,18 @@ export const createCard = async (
   next: NextFunction
 ) => {
   try {
+    const boardId = req.params.boardId;
     const { content, pos, height } = req.body;
-    const data = await services.createCard({ content, pos, height } as {
+    const data = await services.createCard({
+      content,
+      pos,
+      height,
+      boardId,
+    } as {
       content: string;
       pos: { x: number; y: number };
       height: number;
+      boardId: string;
     });
 
     const newCard = {
@@ -82,8 +92,13 @@ export const updateCard = async (
 ) => {
   try {
     const id = req.params.id;
+    const boardId = req.params.boardId;
     const { content, pos, height } = req.body;
-    const updatedCard = await services.updateCard(id, { content, pos, height });
+    const updatedCard = await services.updateCard(id, boardId, {
+      content,
+      pos,
+      height,
+    });
     if (!updatedCard) {
       res.status(404).json({ message: "Card not found" });
       return;

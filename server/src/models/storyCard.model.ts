@@ -5,4 +5,5 @@ export interface StoryCard {
   pos_y: number;
   height: number;
   created_at: string;
+  board_id: string;
 }

@@ -5,7 +5,7 @@ import {
   POSTGRES_USER,
   POSTGRES_PASSWORD,
   POSTGRES_DB,
-} from "../../config/index";
+} from "../config/index";
 
 const pgCongig: PoolConfig = {
   host: POSTGRES_HOST,

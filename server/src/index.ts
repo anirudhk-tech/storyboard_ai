@@ -6,7 +6,7 @@ import { errorHandler } from "./middleware/error.middleware";
 const app = express();
 
 app.use(cors(), express.json());
-app.use("/cards", storyCardRouter);
+app.use("/boards/:boardId/cards", storyCardRouter);
 app.use(errorHandler);
 
 app.get("/health", (req: Request, res: Response) => {

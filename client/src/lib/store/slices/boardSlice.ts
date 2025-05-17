@@ -7,12 +7,14 @@ export interface BoardSize {
 }
 
 export interface BoardSlice {
+	boardId: string | null;
 	cards: StoryCard[];
 	boardSize: BoardSize;
 	addedIdsStack: string[];
 }
 
 const initialState: BoardSlice = {
+	boardId: null,
 	cards: [],
 	boardSize: {
 		width: 0,
@@ -25,6 +27,9 @@ export const boardSlice = createSlice({
 	name: 'board',
 	initialState,
 	reducers: {
+		setBoardId: (state, action) => {
+			state.boardId = action.payload;
+		},
 		setCards: (state, action) => {
 			state.cards = action.payload;
 			state.addedIdsStack = action.payload.map((card: StoryCard) => card.id);
@@ -99,6 +104,7 @@ export const {
 	moveCard,
 	changeSuggestionToCard,
 	resizeCardHeight,
-	setCards
+	setCards,
+	setBoardId
 } = boardSlice.actions;
 export default boardSlice.reducer;

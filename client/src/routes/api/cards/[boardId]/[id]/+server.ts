@@ -1,9 +1,9 @@
 import { SERVER_URL } from '$lib/config.server';
 import { json, type RequestHandler } from '@sveltejs/kit';
-import type { StoryCard } from '../../../../lib/types/storyCard';
+import type { StoryCard } from '../../../../../lib/types/storyCard';
 
 export const GET: RequestHandler = (async ({ params }) => {
-	const res = await fetch(SERVER_URL + '/cards/' + params.id, {
+	const res = await fetch(SERVER_URL + `/boards/${params.boardId}/cards/` + params.id, {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',
@@ -22,7 +22,7 @@ export const GET: RequestHandler = (async ({ params }) => {
 export const PUT: RequestHandler = (async ({ request, params }) => {
 	const { content, height, pos } = (await request.json()) as StoryCard;
 
-	const res = await fetch(SERVER_URL + '/cards/' + params.id, {
+	const res = await fetch(SERVER_URL + `/boards/${params.boardId}/cards/` + params.id, {
 		method: 'PUT',
 		headers: {
 			'Content-Type': 'application/json',
@@ -40,7 +40,7 @@ export const PUT: RequestHandler = (async ({ request, params }) => {
 }) satisfies RequestHandler;
 
 export const DELETE: RequestHandler = (async ({ params }) => {
-	const res = await fetch(SERVER_URL + '/cards/' + params.id, {
+	const res = await fetch(SERVER_URL + `/boards/${params.boardId}/cards/` + params.id, {
 		method: 'DELETE',
 		headers: {
 			'Content-Type': 'application/json',

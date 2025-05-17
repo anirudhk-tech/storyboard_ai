@@ -9,3 +9,5 @@ export const reduxState = readable<MainState>(reduxStore.getState(), (set) => {
 });
 
 export const boardStore = derived(reduxState, (state) => state.board);
+export const aiStore = derived(reduxState, (state) => state.ai);
+export const dialogStore = derived(reduxState, (state) => state.dialog);
