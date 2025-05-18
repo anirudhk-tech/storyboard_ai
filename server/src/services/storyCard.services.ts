@@ -2,6 +2,11 @@ import pool from "../db";
 import { SQL } from "../models/sql.model";
 import { StoryCard } from "../../src/models/storyCard.model";
 
+export const checkBoardExists = async (boardId: string): Promise<boolean> => {
+  const { rows } = await pool.query(SQL.checkBoardExists, [boardId]);
+  return rows.length > 0;
+};
+
 export const getAllCards = async (boardId: string): Promise<StoryCard[]> => {
   const { rows } = await pool.query(SQL.all, [boardId]);
   return rows;

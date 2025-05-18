@@ -2,6 +2,14 @@ import { SERVER_URL } from '$lib/config.server';
 import type { StoryCard } from '../../../../lib/types/storyCard';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
+export const HEAD: RequestHandler = async ({ params }) => {
+	const res = await fetch(`${SERVER_URL}/boards/${params.boardId}`, {
+		method: 'HEAD'
+	});
+
+	return new Response(null, { status: res.status });
+};
+
 export const GET: RequestHandler = (async ({ params }) => {
 	const res = await fetch(SERVER_URL + `/boards/${params.boardId}/cards/`, {
 		method: 'GET',
@@ -36,5 +44,6 @@ export const POST: RequestHandler = (async ({ request, params }) => {
 	}
 
 	const data: StoryCard = await res.json();
+
 	return json(data);
 }) satisfies RequestHandler;

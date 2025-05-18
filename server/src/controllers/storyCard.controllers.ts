@@ -2,12 +2,38 @@ import { Request, Response, NextFunction } from "express";
 import * as services from "../services/storyCard.services";
 import { StoryCard } from "../models/storyCard.model";
 
+export const checkBoardExists = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.log(
+    "[RECIEVED] checkBoardExists: Checking if board " + req.params.boardId
+  );
+
+  try {
+    const boardId = req.params.boardId;
+    const boardExists = await services.checkBoardExists(boardId);
+    if (!boardExists) {
+      res.status(404).json({ message: "Board not found" });
+      return;
+    }
+    res.status(200).json({ message: "Board exists" });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const listCards = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   try {
+    console.log(
+      "[RECIEVED] listCards: Fetching cards for board " + req.params.boardId
+    );
+
     const boardId = req.params.boardId;
     const cards: StoryCard[] = await services.getAllCards(boardId);
 
@@ -38,6 +64,8 @@ export const getCard = async (
   res: Response,
   next: NextFunction
 ) => {
+  console.log("[RECIEVED] getCard: Fetching card " + req.params.id);
+
   try {
     const id = req.params.id;
     const card = await services.getCardById(id);
@@ -57,8 +85,13 @@ export const createCard = async (
   next: NextFunction
 ) => {
   try {
+    console.log(
+      "[RECIEVED] createCard: Creating card for board " + req.params.boardId
+    );
+
     const boardId = req.params.boardId;
     const { content, pos, height } = req.body;
+
     const data = await services.createCard({
       content,
       pos,
@@ -91,6 +124,8 @@ export const updateCard = async (
   next: NextFunction
 ) => {
   try {
+    console.log("[RECIEVED] updateCard: Updating card " + req.params.id);
+
     const id = req.params.id;
     const boardId = req.params.boardId;
     const { content, pos, height } = req.body;
@@ -115,6 +150,8 @@ export const deleteCard = async (
   next: NextFunction
 ) => {
   try {
+    console.log("[RECIEVED] deleteCard: Deleting card " + req.params.id);
+
     const id = req.params.id;
     const deletedCard = await services.removeCard(id);
     if (!deletedCard) {

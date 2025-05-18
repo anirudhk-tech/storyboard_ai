@@ -10,15 +10,15 @@
 	import SaveIcon from '~icons/mdi/content-save-outline';
 	import { toggleSaveDialog } from '$lib/services/dialogServices';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
+		import { Toaster } from '$lib/components/ui/sonner';
 
 	$: cards = $boardStore.cards;
 	$: boardSize = $boardStore.boardSize ?? { width: 1000, height: 1000 };
-	
+
 	let container: HTMLDivElement;
 	let viewport: HTMLDivElement;
 
 	onMount(() => {
-		loadCards();
 		const z: ZoomBehavior<HTMLDivElement, unknown> = zoom<HTMLDivElement, unknown>()
 			.filter((e) => {
 				if (e.type === 'dblclick' || (e.target as HTMLElement).closest('.drag-root')) return false;
@@ -69,6 +69,7 @@
 	</div>
 </div>
 <SaveDialog/>
+<Toaster/>
 <button
 class="absolute top-4 right-4 z-50 p-2 bg-white rounded-md hover:opacity-70"
 on:click={handleSaveButtonClick}
