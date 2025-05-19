@@ -16,15 +16,16 @@ import { DEFAULT_CARD_HEIGHT } from '$lib';
 import { toast } from 'svelte-sonner';
 
 export const checkBoardExists = async (boardId: string | null) => {
-	if (!boardId) return;
+	if (!boardId) return false;
 	const res = await fetch(`/api/cards/${boardId}`, {
 		method: 'HEAD'
 	});
-	if (!res.ok) {
-		return true;
+
+	if (res.status === 404) {
+		return false;
 	}
 
-	return false;
+	return true;
 };
 
 export const loadCards = async (boardId: string | null) => {
@@ -125,19 +126,19 @@ export const moveCardOnBoardState = (cardId: string, newPos: StoryCardPosition) 
 
 export const moveCardOnBoardFinal = async (card: StoryCard, newPos: StoryCardPosition) => {
 	const boardId = reduxStore.getState().board.boardId;
-	if (!boardId) return;
+	if (boardId) {
+		const res = await fetch(`/api/cards/${boardId}/${card.id}`, {
+			method: 'PUT',
+			body: JSON.stringify({
+				height: card!.height,
+				pos: newPos,
+				content: card!.content
+			})
+		});
 
-	const res = await fetch(`/api/cards/${boardId}/${card.id}`, {
-		method: 'PUT',
-		body: JSON.stringify({
-			height: card!.height,
-			pos: newPos,
-			content: card!.content
-		})
-	});
-
-	if (!res.ok) {
-		throw new Error('Failed to move card');
+		if (!res.ok) {
+			throw new Error('Failed to move card');
+		}
 	}
 
 	reduxStore.dispatch(
@@ -226,7 +227,10 @@ export const addSuggestionToBoard = async (prevCard: StoryCard) => {
 
 export const commitSuggestionToBoard = async (card: StoryCard) => {
 	const boardId = reduxStore.getState().board.boardId;
-	if (!boardId) return;
+	if (!boardId) {
+		reduxStore.dispatch(changeSuggestionToCard({ cardId: card.id }));
+		return;
+	}
 
 	const res = await fetch('/api/cards', {
 		method: 'POST',
@@ -240,6 +244,7 @@ export const commitSuggestionToBoard = async (card: StoryCard) => {
 	if (!res.ok) {
 		throw new Error('Failed to create card');
 	}
+
 	reduxStore.dispatch(changeSuggestionToCard({ cardId: card.id }));
 };
 

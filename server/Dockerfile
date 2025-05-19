@@ -5,11 +5,11 @@
 # ---------------------------------------------------------------------------------
 
 # Use the Bun image to build the application inside /app
-FROM oven/bun:edge AS builder
+FROM oven/bun:latest AS builder
 WORKDIR /app
 
 # Copy bun files and install dependencies
-COPY bun.lockb bunfig.toml package.json ./
+COPY bun.lock package.json ./
 RUN bun install
 
 # Copy application code and build
@@ -21,7 +21,7 @@ RUN bun run build
 # ---------------------------------------------------------------------------------
 
 # Start bun runtime
-FROM oven/bun:edge
+FROM oven/bun:latest
 WORKDIR /app
 
 # Copy build from builder

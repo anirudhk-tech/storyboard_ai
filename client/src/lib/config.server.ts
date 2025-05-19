@@ -15,7 +15,7 @@ const env = z
 		SUGGESTION_TOKEN_LIMIT: z.number().default(100),
 		SUMMARIZATION_MODEL: z.string().default('gpt-3.5-turbo'),
 		SUMMARIZATION_TOKEN_LIMIT: z.number().default(100),
-		SERVER_URL: z.string().default('http://localhost:3000')
+		SERVER_URL: z.string().default('http://localhost:4000')
 	})
 	.parse(raw);
 

@@ -50,7 +50,7 @@ const handleSave = async () => {
 const handleLoad = async () => {
     changeBoardId(inputId);
     await loadCards(inputId);
-      toggleSaveDialog(false);
+    toggleSaveDialog(false);
 };
 </script>
  
