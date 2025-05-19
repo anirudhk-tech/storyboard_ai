@@ -3,7 +3,7 @@ import type { StoryCard } from '../../../../lib/types/storyCard';
 import { json, type RequestHandler } from '@sveltejs/kit';
 
 export const HEAD: RequestHandler = async ({ params }) => {
-	const res = await fetch(`${SERVER_URL}/boards/${params.boardId}`, {
+	const res = await fetch(`${SERVER_URL}/boards/${params.boardId}/cards/`, {
 		method: 'HEAD'
 	});
 
