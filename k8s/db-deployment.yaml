@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+spec:
+  replicas: 1 # Number of dbs
+  selector:
+    matchLabels:
+      app: db # Identify pods this deployment owns
+    template:
+      metadata:
+        labels:
+          app: db # Label for the pod
+        spec:
+          containers:
+            - name: postgres
+              image: postgres:15-alpine # Use the official PostgreSQL image
+              ports:
+                - containerPort: 5432 # Expose PostgreSQL port
+              env:
+                - name: POSTGRES_USER # Environment variables for PostgreSQL
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-creds
+                      key: POSTGRES_USER
+                - name: POSTGRES_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-creds
+                      key: POSTGRES_PASSWORD
+                - name: POSTGRES_DB
+                  valueFrom:
+                    secretKeyRef:
+                      name: db-creds
+                      key: POSTGRES_DB
+              volumeMounts:
+                - name: db-storage # Mount the volume
+                  mountPath: /var/lib/postgresql/data # Path in the container
+          volumes:
+            - name: db-storage # Name of the volume
+              persistentVolumeClaim:
+                claimName: db-pvc # Reference to the PVC

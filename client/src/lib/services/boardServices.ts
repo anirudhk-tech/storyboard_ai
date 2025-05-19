@@ -49,14 +49,17 @@ export const saveCards = async (boardId: string | null) => {
 	if (!boardId) return;
 
 	const cards = reduxStore.getState().board.cards;
-	const savePromises = cards.map((card) => {
+	const savePromises = cards.map(async (card) => {
 		return fetch(`/api/cards/${boardId}`, {
 			method: 'POST',
 			body: JSON.stringify({
 				content: card.content,
 				height: card.height,
 				pos: card.pos
-			})
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
 		}).then((res) => {
 			if (!res.ok) {
 				throw new Error('Failed to save cards');
@@ -89,7 +92,10 @@ export const addCardToBoard = async (newPos: StoryCardPosition, suggestion: bool
 				content: '',
 				height: DEFAULT_CARD_HEIGHT,
 				pos: newPos
-			})
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
 		});
 
 		if (!res.ok) {
@@ -133,7 +139,10 @@ export const moveCardOnBoardFinal = async (card: StoryCard, newPos: StoryCardPos
 				height: card!.height,
 				pos: newPos,
 				content: card!.content
-			})
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
 		});
 
 		if (!res.ok) {
@@ -199,7 +208,10 @@ export const addSuggestionToBoard = async (prevCard: StoryCard) => {
 			prevSummary: reduxStore.getState().ai.summary,
 			cardStack: reduxStore.getState().board.addedIdsStack,
 			cards: reduxStore.getState().board.cards
-		})
+		}),
+		headers: {
+			'Content-Type': 'application/json'
+		}
 	});
 	const data: SuggestionResponse = await res.json();
 
@@ -238,7 +250,10 @@ export const commitSuggestionToBoard = async (card: StoryCard) => {
 			content: card.content,
 			height: card.height,
 			pos: card.pos
-		})
+		}),
+		headers: {
+			'Content-Type': 'application/json'
+		}
 	});
 
 	if (!res.ok) {
@@ -261,7 +276,10 @@ export const changeCardHeight = async (card: StoryCard, height: number) => {
 				height: height,
 				pos: card.pos,
 				content: card.content
-			})
+			}),
+			headers: {
+				'Content-Type': 'application/json'
+			}
 		});
 
 		if (!res.ok) {

@@ -24,6 +24,7 @@ export const createCard = async (card: {
   height: number;
 }): Promise<StoryCard> => {
   const { content, pos, height, boardId } = card;
+  console.log("→ createCard payload:", card);
   const { rows } = await pool.query(SQL.create, [
     content,
     pos.x,
