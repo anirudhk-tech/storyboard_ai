@@ -1,0 +1,20 @@
+# server/.dockerignore
+
+# Bun and Node modules
+
+node_modules/
+bun.lockb
+
+# Local build artifacts (if you have a dist/ or build/ folder)
+
+dist/
+build/
+
+# TypeScript cache
+
+\*.tsbuildinfo
+
+# IDE / OS
+
+.vscode/
+.DS_Store

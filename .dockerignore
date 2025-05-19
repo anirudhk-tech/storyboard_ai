@@ -1,0 +1,28 @@
+# Root .dockerignore
+
+# Compose override (local only)
+docker-compose.override.yml
+
+# Environment secrets
+.env
+*.env.local
+.env.*.local
+
+# Git data
+.git
+.gitignore
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+*.log
+
+# Node / Bun artifacts
+node_modules/
+bun.lockb
+
+# SvelteKit builds (if any)
+.svelte-kit/
+build/
+dist/

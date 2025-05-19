@@ -1,0 +1,17 @@
+# client/.dockerignore
+
+# Bun and Node modules
+
+node_modules/
+bun.lockb
+
+# SvelteKit dev and build outputs
+
+.svelte-kit/
+build/
+dist/
+
+# IDE / OS
+
+.vscode/
+.DS_Store
