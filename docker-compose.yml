@@ -2,12 +2,18 @@ version: "3.8" # Compose file version
 
 services:
   db: # PostgreSQL database service
+    healthcheck: # Test health
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}"]
+      interval: 10s
+      retries: 5
     image: postgres:15-alpine # Use the official PostgreSQL image
     restart: always # Restart policy: Always restart on failure
+    env_file:
+      - .env
     environment: # Environment variables for PostgreSQL
-      POSTGRES_USER: sb_user
-      POSTGRES_PASSWORD: sb_password
-      POSTGRES_DB: storyboard
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - db-data:/var/lib/postgresql/data # Mount a volume for persistent data
     networks:
@@ -19,8 +25,16 @@ services:
       dockerfile: Dockerfile # Dockerfile for the backend
     depends_on:
       - db # Wait for the database to be ready
+    restart: always # Restart policy: Always restart on failure
+    env_file:
+      - .env # Load environment variables from .env file
     environment: # Environment variables for the backend
-      PORT: 4000
+      EXPRESS_PORT: ${EXPRESS_PORT}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     expose:
       - "4000" # Expose port 4000 for the backend service
     networks:
@@ -32,9 +46,12 @@ services:
       dockerfile: Dockerfile # Dockerfile for the kit service
     depends_on:
       - backend # Wait for the backend to be ready
+    restart: always # Restart policy: Always restart on failure
     env_file:
       - .env # Load environment variables from .env file
     environment: # Environment variables for the kit service
+      OPENAI_KEY: ${OPENAI_KEY}
+      OPENAI_ACTIVE: ${OPENAI_ACTIVE}
       PORT: 3000
     expose:
       - "3000" # Expose port 3000 for the kit service
