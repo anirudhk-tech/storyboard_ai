@@ -1,0 +1,20 @@
+name: 🛳️ Publish Helm chart to GitHub Pages
+
+on:
+  release:
+    types: [created] # triggers on git-tag + push a GitHub Release
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 2. Package, index, and push chart to gh-pages
+      - uses: helm/chart-releaser-action@v1
+        with:
+          charts_dir: "./helm-chart"
+          charts_repo_url: "https://anirudhk_tech.github.io/storyboard_ai"
+          charts_target_branch: gh-pages
+          token: ${{ secrets.GITHUB_TOKEN }}
