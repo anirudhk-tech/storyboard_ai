@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "helm_chart.name" -}}
+{{- define "helm-chart.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "helm_chart.fullname" -}}
+{{- define "helm-chart.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "helm_chart.chart" -}}
+{{- define "helm-chart.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "helm_chart.labels" -}}
-helm.sh/chart: {{ include "helm_chart.chart" . }}
-{{ include "helm_chart.selectorLabels" . }}
+{{- define "helm-chart.labels" -}}
+helm.sh/chart: {{ include "helm-chart.chart" . }}
+{{ include "helm-chart.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,18 +45,47 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "helm_chart.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "helm_chart.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{- define "helm-chart.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "helm-chart.name" . }}
+app.kubernetes.io/instance: {{ include "story-board.fullname" . }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "helm_chart.serviceAccountName" -}}
+{{- define "helm-chart.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "helm_chart.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "helm-chart.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
+{{- end }}
+
+{{/*
+ Alias block - maps "story-board.*" helpers to "helm-chart.*"
+ so the chart may reference {{ include "story-board.fullname" . }}
+*/}}
+
+{{- define "story-board.name" -}}
+{{ include "helm-chart.name" . }}
+{{- end }}
+
+{{- define "story-board.fullname" -}}
+{{ include "helm-chart.fullname" . }}
+{{- end }}
+
+{{- define "story-board.chart" -}}
+{{ include "helm-chart.chart" . }}
+{{- end }}
+
+{{- define "story-board.labels" -}}
+{{ include "helm-chart.labels" . }}
+{{- end }}
+
+{{- define "story-board.selectorLabels" -}}
+{{ include "helm-chart.selectorLabels" . }}
+{{- end }}
+
+{{- define "story-board.serviceAccountName" -}}
+{{ include "helm-chart.serviceAccountName" . }}
 {{- end }}

@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ .Release.Name }}-db-pvc
+  name: {{ include "story-board.fullname" . }}-db-pvc
   labels:
-    app.kubernetes.io/name: {{ .Release.Name }}-db
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ include "story-board.fullname" . }}-db
+    app.kubernetes.io/instance: {{ include "story-board.fullname" . }}
 spec:
   accessModes: [ "ReadWriteOnce" ]
   storageClassName: {{ .Values.db.storage.className | quote }}

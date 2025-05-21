@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-nginx
+  name: {{ include "story-board.fullname" . }}-nginx
   labels:
-    app: {{ .Release.Name }}-nginx
+    app: {{ include "story-board.fullname" . }}-nginx
 spec:
   replicas: {{ .Values.nginx.replicas }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}-nginx
+      app: {{ include "story-board.fullname" . }}-nginx
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}-nginx
+        app: {{ include "story-board.fullname" . }}-nginx
     spec:
       containers:
         - name: nginx
@@ -32,3 +32,10 @@ spec:
               port: {{ .Values.nginx.service.port }}
             initialDelaySeconds: 15
             periodSeconds: 20
+          volumeMounts:
+          - name: nginx-conf
+            mountPath: /etc/nginx/conf.d      
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: {{ include "story-board.fullname" . }}-nginx-conf

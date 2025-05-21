@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-frontend
+  name: {{ include "story-board.fullname" . }}-frontend
   labels:
-    app.kubernetes.io/name: {{ .Release.Name }}-frontend
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/name: {{ include "story-board.fullname" . }}-frontend
+    app.kubernetes.io/instance: {{ include "story-board.fullname" . }}
 spec:
   replicas: {{ .Values.frontend.replicas }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ .Release.Name }}-frontend
+      app.kubernetes.io/name: {{ include "story-board.fullname" . }}-frontend
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ .Release.Name }}-frontend
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        app.kubernetes.io/name: {{ include "story-board.fullname" . }}-frontend
+        app.kubernetes.io/instance: {{ include "story-board.fullname" . }}
     spec:
       containers:
         - name: frontend
@@ -26,12 +26,12 @@ spec:
             - name: OPENAI_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-frontend-creds
+                  name: {{ include "story-board.fullname" . }}-frontend-creds
                   key: OPENAI_KEY
             - name: OPENAI_ACTIVE
               valueFrom:
                 secretKeyRef:
-                  name: {{ .Release.Name }}-frontend-creds
+                  name: {{ include "story-board.fullname" . }}-frontend-creds
                   key: OPENAI_ACTIVE
           readinessProbe:
             httpGet:

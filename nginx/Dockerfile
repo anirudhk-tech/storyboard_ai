@@ -4,6 +4,5 @@
 # STAGE 1: Configure Nginx
 # ----------------------------------------------------------------------------------
 
-# Use default nginx image and replace default config with custom
+# Use default nginx image. Nginx config is done with HELM
 FROM nginx:alpine
-COPY default.conf /etc/nginx/conf.d/default.conf
