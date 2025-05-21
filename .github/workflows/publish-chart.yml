@@ -21,8 +21,7 @@ jobs:
       - name: Package & index chart
         run: |
           mkdir -p packaged
-          helm package helm-chart    
-          mv story-board-*.tgz packaged/
+          helm package helm-chart --destination packaged
           helm repo index packaged --url https://anirudhk-tech.github.io/storyboard_ai
 
       - name: Commit to GitHub Pages
