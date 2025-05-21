@@ -24,7 +24,7 @@ jobs:
         run: helm lint helm-chart
 
       - name: Helm template test
-        run: helm template helm-chart --debug --fail-on-warnings
+        run: helm template helm-chart --debug
 
   build-and-push:
     name: 🛠️ Build & Push Docker Images
