@@ -48,10 +48,20 @@ jobs:
 
       - name: Build & push images
         run: |
-          for service in frontend backend nginx; do
-            docker build \
-              -t anirudhktech/story-board-$service:latest \
-              -f $service/Dockerfile \
-              $service
-            docker push anirudhktech/story-board-$service:latest
-          done
+          docker build \
+            --file client/Dockerfile \
+            --tag anirudhktech/story-board-frontend:latest \
+            client
+          docker push anirudhktech/story-board-frontend:latest
+
+          docker build \
+            --file server/Dockerfile \
+            --tag anirudhktech/story-board-backend:latest \
+            server
+          docker push anirudhktech/story-board-backend:latest
+
+          docker build \
+            --file nginx/Dockerfile \
+            --tag anirudhktech/story-board-nginx:latest \
+            nginx
+          docker push anirudhktech/story-board-nginx:latest
