@@ -1,20 +1,35 @@
-name: 🛳️ Publish Helm chart to GitHub Pages
+name: Publish Helm chart to GitHub Pages
 
 on:
-  release:
-    types: [created] # triggers on git-tag + push a GitHub Release
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
-  publish:
+  build-and-publish:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-
-      # package, index, and push chart to gh-pages
-      - uses: helm/chart-releaser-action@v1
         with:
-          charts_dir: "./helm-chart"
-          charts_repo_url: "https://anirudhk_tech.github.io/storyboard_ai"
-          charts_target_branch: gh-pages
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0 # need full history for git tags
+
+      - uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+
+      - name: Package & index chart
+        run: |
+          mkdir -p packaged
+          helm package helm-chart    
+          mv story-board-*.tgz packaged/
+          helm repo index packaged --url https://anirudhk-tech.github.io/storyboard_ai
+
+      - name: Commit to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packaged
+          publish_branch: gh-pages
+          user_name: github-actions
+          user_email: github-actions@github.com
