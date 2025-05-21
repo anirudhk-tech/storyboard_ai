@@ -50,6 +50,8 @@ jobs:
         run: |
           docker build \
             --file client/Dockerfile \
+            --build-arg OPENAI_KEY=${{ secrets.OPENAI_KEY }} \
+            --build-arg OPENAI_ACTIVE=${{ secrets.OPENAI_ACTIVE }} \
             --tag anirudhktech/story-board-frontend:latest \
             client
           docker push anirudhktech/story-board-frontend:latest

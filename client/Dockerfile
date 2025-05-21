@@ -1,5 +1,11 @@
 # client/Dockerfile
 
+ARG OPENAI_KEY
+ARG OPENAI_ACTIVE
+
+ENV OPENAI_KEY=$OPENAI_KEY
+ENV OPENAI_ACTIVE=$OPENAI_ACTIVE
+
 # ---------------------------------------------------------------------------------
 # STAGE 1: Install dependencies and build the application
 # ---------------------------------------------------------------------------------
