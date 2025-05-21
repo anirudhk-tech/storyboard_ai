@@ -2,5 +2,5 @@
 k8s/00-db-secret.yaml
 k8s/01-backend-secret.yaml
 k8s/02-frontend-secret.yaml
-helm-chart/values.yaml
+helm-chart/values-secret.yaml
 helm-chart-0.1.0.tgz

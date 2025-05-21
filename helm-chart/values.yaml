@@ -1,0 +1,86 @@
+replicaCount: 1
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+db:
+  user: "sb_user"
+  password: "CHANGE ME"
+  database: "storyboard"
+  image: "postgres:15-alpine"
+  replicas: 1
+  storage:
+    size: "1Gi"
+  service:
+    type: "ClusterIP"
+    port: 5432
+
+# SQL files that should run the first time the cluster starts.
+initScripts:
+  001-init.sql: |
+    CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+    CREATE TABLE IF NOT EXISTS public.storycards (
+      id         UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+      content    TEXT        NOT NULL,
+      pos_x      DOUBLE PRECISION NOT NULL,
+      pos_y      DOUBLE PRECISION NOT NULL,
+      height     INTEGER     NOT NULL DEFAULT 0,
+      created_at TIMESTAMP   NOT NULL DEFAULT now(),
+      board_id   TEXT        NOT NULL
+    );
+
+frontend:
+  image: "anirudhktech/story-board-frontend:latest"
+  replicas: 1
+  service:
+    type: "ClusterIP"
+    port: 3000
+  env:
+    openaiKey: "CHANGE ME"
+    openaiActive: "true"
+
+backend:
+  image: "anirudhktech/story-board-backend:latest"
+  replicas: 1
+  service:
+    type: "ClusterIP"
+    port: 4000
+  env:
+    postgresPort: "5432"
+    postgresDb: "storyboard"
+    postgresUser: "sb_user"
+    postgresPassword: "CHANGE ME"
+    expressPort: "4000"
+
+nginx:
+  image: "anirudhktech/story-board-nginx:latest"
+  replicas: 1
+  service:
+    type: "NodePort"
+    port: 80
+
+service:
+  port: 80
+
+ingress:
+  enabled: true
+  className: ""
+
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+
+  hosts:
+    - host: storyboard.local
+      paths:
+        - path: /
+          pathType: Prefix
+          servicePort: 80
+
+  tls:
+    - secretName: tls-secret
+      hosts:
+        - storyboard.local
