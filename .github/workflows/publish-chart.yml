@@ -11,7 +11,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # 2. Package, index, and push chart to gh-pages
+      # package, index, and push chart to gh-pages
       - uses: helm/chart-releaser-action@v1
         with:
           charts_dir: "./helm-chart"
