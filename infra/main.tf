@@ -118,8 +118,10 @@ resource "aws_instance" "app" {
       --namespace default \
       --create-namespace \
       --reuse-values \
+      --set ingress.enabled=true \
       --set ingress.hosts[0].host="${var.public_dns}" \
-      --set ingress.hosts[0].paths[0]="/" \
+      --set ingress.hosts[0].paths[0].path="/" \
+      --set ingress.hosts[0].paths[0].pathType="Prefix" \
       --set frontend.env.openaiKey="${var.openai_key}" \
       --set backend.env.postgresPassword="${var.db_password}" \
       --set db.password="${var.db_password}"
