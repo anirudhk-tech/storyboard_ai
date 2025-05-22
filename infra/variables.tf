@@ -39,4 +39,16 @@ variable "helm_release_name" {
   default     = "storyboard"
 }
 
+variable "openai_key" {
+  description = "OpenAI API key for the frontend"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_password" {
+  description = "Postgres password for the backend"
+  type        = string
+  sensitive   = true
+}
+
 
