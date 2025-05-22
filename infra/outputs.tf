@@ -1,6 +1,6 @@
 output "app_public_dns" {
-  description = "Public DNS name of the EC2 running your app"
-  value       = aws_instance.app_eip.public_dns
+  description = "Elastic, Persisitent DNS of the app"
+  value       = aws_eip.app_eip.public_dns
 }
 
 output "app_public_ip" {
