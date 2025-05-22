@@ -3,12 +3,12 @@ entries:
   helm-chart:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2025-05-22T13:50:47.310187274Z"
+    created: "2025-05-22T14:00:02.767939982Z"
     description: A Helm chart for Story Board AI
-    digest: aef67b812254451b17c21b482b740535c1d74027288295059b27bddfe7ead4bc
+    digest: 2ebb01bc9fb631c84fc33a79d28ae1806220a69fde02a42dfb02e82fb6ba45cd
     name: helm-chart
     type: application
     urls:
     - https://anirudhk-tech.github.io/storyboard_ai/helm-chart-0.1.0.tgz
     version: 0.1.0
-generated: "2025-05-22T13:50:47.309532034Z"
+generated: "2025-05-22T14:00:02.767300578Z"
