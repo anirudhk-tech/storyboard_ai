@@ -124,8 +124,7 @@ resource "aws_instance" "app" {
         --set ingress.hosts[0].paths[0].pathType="Prefix" \
         --set frontend.env.openaiKey="${var.openai_key}" \
         --set backend.env.postgresPassword="${var.db_password}" \
-        --set db.password="${var.db_password}
-        "
+        --set db.password="${var.db_password}"
       ' > /var/log/helm.log 2>&1 &
   
     # Early exit while chart loads for ssh access and watching logs
