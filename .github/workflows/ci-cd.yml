@@ -130,4 +130,5 @@ jobs:
 
       - name: Show app URL
         run: |
-          echo "App URL: http://$(terraform output -raw app_public_dns)"
+          APP_HOST=$(terraform output -raw app_public_dns)
+          echo "App URL: http://${APP_HOST}"
