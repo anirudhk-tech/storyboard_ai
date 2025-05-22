@@ -136,4 +136,4 @@ jobs:
 
       - name: Show app URL
         run: |
-          echo "🎉 App URL is ${{ steps.get-url.outputs.app_url }}
+          echo "🎉 App URL is ${{ steps.get-url.outputs.app_url }}"
