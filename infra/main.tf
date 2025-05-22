@@ -101,6 +101,9 @@ resource "aws_instance" "app" {
     # Install lightweight kubernetes with default Traefik Ingress controller
     curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="" sh -
 
+    # Set config path in EC2 instance
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
     # Install helm
     curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
