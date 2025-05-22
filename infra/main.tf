@@ -107,23 +107,26 @@ resource "aws_instance" "app" {
     # Install helm
     curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-    # Pulling helm chart from github pages
-    helm repo add storyboard_ai ${var.helm_repo_url}
-    helm repo update
 
-    # Install the chart named "helm-chart" version "0.1.0"
-    helm upgrade --install ${var.helm_release_name} \
-      storyboard_ai/helm-chart \
-      --version 0.1.0 \
-      --namespace default \
-      --create-namespace \
-      --reuse-values \
-      --set ingress.enabled=true \
-      --set ingress.hosts[0].host="${var.public_dns}" \
-      --set ingress.hosts[0].paths[0].path="/" \
-      --set ingress.hosts[0].paths[0].pathType="Prefix" \
-      --set frontend.env.openaiKey="${var.openai_key}" \
-      --set backend.env.postgresPassword="${var.db_password}" \
-      --set db.password="${var.db_password}"
+    # Install the chart named "helm-chart" in the background
+    nohup bash -c '
+      helm repo add storyboard_ai ${var.helm_repo_url}
+      helm repo update
+      helm upgrade --install ${var.helm_release_name} \
+        storyboard_ai/helm-chart \
+        --version 0.1.0 \
+        --namespace default \
+        --create-namespace \
+        --set ingress.enabled=true \
+        --set ingress.hosts[0].host="${var.public_dns}" \
+        --set ingress.hosts[0].paths[0].path="/" \
+        --set ingress.hosts[0].paths[0].pathType="Prefix" \
+        --set frontend.env.openaiKey="${var.openai_key}" \
+        --set backend.env.postgresPassword="${var.db_password}" \
+        --set db.password="${var.db_password}"
+      ' > /var/log/helm.log 2>&1 &
+  
+    # Early exit while chart loads for ssh access and watching logs
+    exit 0
   EOF
 }
