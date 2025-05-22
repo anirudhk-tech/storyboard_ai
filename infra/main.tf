@@ -82,7 +82,7 @@ resource "aws_instance" "app" {
   associate_public_ip_address = true
 
   user_data = <<-EOF
-    # bash
+    #!/usr/bin/env bash
     set -eux
 
     # Install lightweight kubernetes with default Traefik Ingress controller
