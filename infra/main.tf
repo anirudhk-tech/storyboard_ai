@@ -68,7 +68,7 @@ data "aws_ami" "ubuntu" {
   owners      = ["099720109477"]   # Canonical account
   filter {
     name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"] 
   }
 }
 
