@@ -56,4 +56,9 @@ variable "ssh_key_name" {
   type        = string
 }
 
+variable "public_dns" {
+  description = "The DNS name to use in the Ingress host"
+  type        = string
+}
+
 
