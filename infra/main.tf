@@ -72,6 +72,19 @@ data "aws_ami" "ubuntu" {
   }
 }
 
+# Give static eip for url
+resource "aws_eip" "app_eip" {
+  vpc = true
+  tags = {
+    Name = "${var.project_name}-eip"
+  }
+}
+
+resource "aws_eip_association" "app" {
+  instance_id   = aws_instance.app.id
+  allocation_id = aws_eip.app_eip.id
+}
+
 # Create the application in cloud
 resource "aws_instance" "app" {
   ami                         = data.aws_ami.ubuntu.id
