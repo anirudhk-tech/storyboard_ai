@@ -76,6 +76,7 @@ data "aws_ami" "ubuntu" {
 resource "aws_instance" "app" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t2.micro"
+  key_name                    = "${var.ssh_key_name}"
   subnet_id                   = module.vpc.public_subnets[0]
   vpc_security_group_ids      = [aws_security_group.app_sg.id]
   associate_public_ip_address = true

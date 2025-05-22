@@ -126,7 +126,7 @@ jobs:
 
       - name: Terraform Plan & Apply
         run: |
-          terraform apply -replace="aws_instance.app" -auto-approve
+          terraform apply -replace="aws_instance.app" -var="ssh_key_name=Admin" -auto-approve
 
       - name: Get App URL
         id: get-url

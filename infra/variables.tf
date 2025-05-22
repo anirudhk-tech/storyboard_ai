@@ -51,4 +51,9 @@ variable "db_password" {
   sensitive   = true
 }
 
+variable "ssh_key_name" {
+  description = "Key used to SSH into EC2 instance"
+  type        = string
+}
+
 

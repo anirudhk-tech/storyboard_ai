@@ -6,3 +6,4 @@ helm-chart/values-secret.yaml
 helm-chart-0.1.0.tgz
 infra/.terraform
 infra/.terraform.lock.hcl
+Admin.pem
