@@ -26,6 +26,34 @@ jobs:
       - name: Helm template test
         run: helm template helm-chart --debug
 
+  build-and-publish-chart:
+    name: 📦 Build & Publish Helm Chart
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need full history for git tags
+
+      - uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+
+      - name: Package & index chart
+        run: |
+          mkdir -p packaged
+          helm package helm-chart --destination packaged
+          helm repo index packaged --url https://anirudhk-tech.github.io/storyboard_ai
+
+      - name: Commit to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packaged
+          publish_branch: gh-pages
+          user_name: github-actions
+          user_email: github-actions@github.com
+
   build-and-push:
     name: 🛠️ Build & Push Docker Images
     runs-on: ubuntu-latest
