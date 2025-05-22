@@ -1,0 +1,56 @@
+name: 📦 Publish Helm Chart
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  lint-chart:
+    name: 🔍 Lint Helm Chart
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+
+      - name: Helm lint
+        run: helm lint helm-chart
+
+      - name: Helm template test
+        run: helm template helm-chart --debug
+
+  build-and-push-chart:
+    name: 🛠️ Build & Publish Helm Chart
+    runs-on: ubuntu-latest
+    needs: lint-chart
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.0
+
+      - name: Package & index chart
+        run: |
+          mkdir -p packaged
+          helm package helm-chart --destination packaged
+          helm repo index packaged --url https://anirudhk-tech.github.io/storyboard_ai
+
+      - name: Commit to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./packaged
+          publish_branch: gh-pages
+          user_name: github-actions
+          user_email: github-actions@github.com

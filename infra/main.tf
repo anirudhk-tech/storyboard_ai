@@ -74,7 +74,7 @@ data "aws_ami" "ubuntu" {
 
 # Give static eip for url
 resource "aws_eip" "app_eip" {
-  vpc = true
+  domain = "vpc"
   tags = {
     Name = "${var.project_name}-eip"
   }
@@ -114,6 +114,9 @@ resource "aws_instance" "app" {
       --version 0.1.0 \
       --namespace default \
       --create-namespace \
+      --reuse-values \
+      --set ingress.hosts[0].host="ec2-54-145-86-28.compute-1.amazonaws.com" \
+      --set ingress.hosts[0].paths[0]="/" \
       --set frontend.env.openaiKey="${var.openai_key}" \
       --set backend.env.postgresPassword="${var.db_password}" \
       --set db.password="${var.db_password}"
