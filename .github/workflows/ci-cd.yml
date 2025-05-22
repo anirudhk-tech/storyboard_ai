@@ -27,7 +27,7 @@ jobs:
         run: helm template helm-chart --debug
 
   build-and-push-chart:
-    name: 📦 Build & Publish Helm Chart
+    name: 🛠️ Build & Publish Helm Chart
     runs-on: ubuntu-latest
     needs: lint-chart
     steps:
