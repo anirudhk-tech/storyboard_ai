@@ -1,10 +1,9 @@
 name: 🚀 Deploy Terraform Infrastructure
 
 on:
-  workflow_run:
-    workflows: ["📦 Publish Helm Chart"]
-    types:
-      - completed
+  push:
+    branches:
+      - gh-pages
 
 jobs:
   deploy-terraform:
