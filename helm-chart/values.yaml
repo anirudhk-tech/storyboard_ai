@@ -74,7 +74,7 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt
 
   hosts:
-    - host: storyboard.local
+    - host: "*"
       paths:
         - path: /
           pathType: Prefix
