@@ -74,7 +74,7 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt
 
   hosts:
-    - host: *
+    - host: "*"
       paths:
         - path: /
           pathType: Prefix

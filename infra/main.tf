@@ -95,11 +95,13 @@ resource "aws_instance" "app" {
     helm repo update
 
     # Install the chart named "helm-chart" version "0.1.0"
-    helm install ${var.helm_release_name} \
+    helm upgrade --install ${var.helm_release_name} \
       storyboard_ai/helm-chart \
       --version 0.1.0 \
       --namespace default \
-      --create-namespace
+      --create-namespace \
+      --set frontend.env.openaiKey="${var.openai_key}" \
+      --set backend.env.postgresPassword="${var.db_password}" \
+      --set db.password="${var.db_password}"
   EOF
-
 }
