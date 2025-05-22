@@ -128,7 +128,11 @@ jobs:
         run: |
           terraform apply -replace="aws_instance.app" -auto-approve
 
+      - name: Get app URL
+        id: get-url
+        run: |
+          echo "app_url=http://$(terraform output -raw app_public_dns)" >> $GITHUB_OUTPUT
+
       - name: Show app URL
         run: |
-          APP_HOST=$(terraform output -raw app_public_dns)
-          echo "App URL: http://${APP_HOST}"
+          echo "🎉 App URL is ${{ steps.get-url.outputs.app_url }}
