@@ -139,7 +139,7 @@ resource "aws_instance" "app" {
   DEBIAN_FRONTEND=noninteractive apt-get install -y nginx certbot python3-certbot-nginx
 
   cat <<EOF2 > /etc/nginx/sites-available/default
-  
+
   server {
     listen 80;
     server_name ${var.public_domain};
@@ -161,9 +161,10 @@ resource "aws_instance" "app" {
 
   # 6. Let’s Encrypt
   certbot --nginx \
+    --non-interactive
     --agree-tos --redirect --hsts \
     -m anirudhkuppili@gmail.com \
-    -d ai.${var.public_domain}
+    -d ${var.public_domain}
 
   exit 0
   EOF
