@@ -33,6 +33,21 @@ spec:
                 secretKeyRef:
                   name: {{ include "story-board.fullname" . }}-backend-creds
                   key: POSTGRES_PORT
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "story-board.fullname" . }}-backend-creds
+                  key: POSTGRES_DB
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "story-board.fullname" . }}-backend-creds
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "story-board.fullname" . }}-backend-creds
+                  key: POSTGRES_PASSWORD
             - name: EXPRESS_PORT
               valueFrom:
                 secretKeyRef:
