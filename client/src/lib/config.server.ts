@@ -15,6 +15,10 @@ const env = z
 		SUGGESTION_TOKEN_LIMIT: z.number().default(100),
 		SUMMARIZATION_MODEL: z.string().default('gpt-3.5-turbo'),
 		SUMMARIZATION_TOKEN_LIMIT: z.number().default(100),
+		IMAGE_MODEL: z.string().default('gpt-image-1'),
+		IMAGE_TOKEN_LIMIT: z.number().default(100),
+		MESSAGE_MODEL: z.string().default('gpt-3.5-turbo'),
+		MESSAGE_TOKEN_LIMIT: z.number().default(100),
 		SERVER_URL: z.string().default('http://localhost:4000')
 	})
 	.parse(raw);
@@ -25,12 +29,16 @@ export const openai = new OpenAI({
 
 export const MODELS = {
 	SUGGESTION: env.SUGGESTION_MODEL,
-	SUMMARIZATION: env.SUMMARIZATION_MODEL
+	SUMMARIZATION: env.SUMMARIZATION_MODEL,
+	IMAGE: env.IMAGE_MODEL,
+	MESSAGE: env.MESSAGE_MODEL
 };
 
 export const LIMITS = {
 	SUGGESTION: env.SUGGESTION_TOKEN_LIMIT,
-	SUMMARIZATION: env.SUMMARIZATION_TOKEN_LIMIT
+	SUMMARIZATION: env.SUMMARIZATION_TOKEN_LIMIT,
+	IMAGE: env.IMAGE_TOKEN_LIMIT,
+	MESSAGE: env.MESSAGE_TOKEN_LIMIT
 };
 
 export const AI_ACTIVE = env.OPENAI_ACTIVE === 'true';

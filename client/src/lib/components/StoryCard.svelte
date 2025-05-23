@@ -17,8 +17,10 @@
 	import Check from '~icons/lucide/check';
 	import Delete from '~icons/lucide/trash-2';
 	import IconRefreshCwSolid from '~icons/heroicons-outline/refresh';
+	import MessageSquare from '~icons/lucide/message-square';
 	import { boardStore } from '../../svelteBridge';
 	import { DEFAULT_CARD_WIDTH } from '$lib';
+	import { openCardSidebar } from '$lib/services/sidebarServices';
 	export let card: StoryCard;
 
 	let inputEl: HTMLTextAreaElement;
@@ -57,6 +59,10 @@
 
 	const handleDeleteClick = () => {
 		removeCardFromBoard(card.id);
+	};
+
+	const handleChatClick = () => {
+		openCardSidebar(card.id);
 	};
 
 	const autoResize = () => {
@@ -134,6 +140,13 @@
 			></div>
 		{/if}
 		<div class="no-drag absolute -top-7 right-0 flex flex-row gap-2">
+			<button
+					on:mousedown|stopPropagation
+					on:mouseup|stopPropagation
+					on:click|stopPropagation={handleChatClick}
+				>
+					<MessageSquare class="pointer-events-auto cursor-pointer text-white hover:opacity-70" />
+			</button>
 			{#if !card.suggestion}
 				<button
 					on:mousedown|stopPropagation
