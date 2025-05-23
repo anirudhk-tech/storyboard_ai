@@ -24,32 +24,32 @@ spec:
             - name: POSTGRES_HOST
               valueFrom:
                 secretKeyRef:
-                  name: backend-creds
+                  name: {{ include "story-board.fullname" . }}-backend-creds
                   key: POSTGRES_HOST
             - name: POSTGRES_PORT
               valueFrom:
                 secretKeyRef:
-                  name: backend-creds
+                  name: {{ include "story-board.fullname" . }}-backend-creds
                   key: POSTGRES_PORT
             - name: EXPRESS_PORT
               valueFrom:
                 secretKeyRef:
-                  name: backend-creds
+                  name: {{ include "story-board.fullname" . }}-backend-creds
                   key: EXPRESS_PORT
             - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
-                  name: backend-creds
+                  name: {{ include "story-board.fullname" . }}-backend-creds
                   key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: backend-creds
+                  name: {{ include "story-board.fullname" . }}-backend-creds
                   key: POSTGRES_PASSWORD
             - name: POSTGRES_DB
               valueFrom:
                 secretKeyRef:
-                  name: backend-creds
+                  name: {{ include "story-board.fullname" . }}-backend-creds
                   key: POSTGRES_DB
 
           readinessProbe:
