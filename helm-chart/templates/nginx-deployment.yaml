@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "story-board.fullname" . }}-nginx
+  labels:
+    app: {{ include "story-board.fullname" . }}-nginx
+spec:
+  replicas: {{ .Values.nginx.replicas }}
+  selector:
+    matchLabels:
+      app: {{ include "story-board.fullname" . }}-nginx
+  template:
+    metadata:
+      labels:
+        app: {{ include "story-board.fullname" . }}-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: {{ .Values.nginx.image }}
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: {{ .Values.nginx.service.port }}
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.nginx.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.nginx.service.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          volumeMounts:
+          - name: nginx-conf
+            mountPath: /etc/nginx/conf.d      
+      volumes:
+      - name: nginx-conf
+        configMap:
+          name: {{ include "story-board.fullname" . }}-nginx-conf

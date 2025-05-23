@@ -43,3 +43,9 @@ jobs:
             --tag anirudhktech/story-board-backend:latest \
             server
           docker push anirudhktech/story-board-backend:latest
+
+          docker build \
+            --file nginx/Dockerfile \
+            --tag anirudhktech/story-board-nginx:latest \
+            nginx
+          docker push anirudhktech/story-board-nginx:latest

@@ -61,12 +61,6 @@ variable "public_domain" {
   type        = string
 }
 
-variable "story_board_full_name" {
-  description = "The full name of the containers being deployed"
-  type        = string
-  default     = "storyboard"
-}
-
 variable "frontend_service_port" {
   description = "The port that the frontend is served on"
   type        = number

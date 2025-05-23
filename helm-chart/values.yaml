@@ -58,6 +58,15 @@ backend:
     postgresPassword: "CHANGE ME"
     expressPort: "4000"
 
+nginx:
+  image: "anirudhktech/story-board-nginx:latest"
+  replicas: 1
+  server_name: "ai.storyboard.website"
+  service:
+    type: "NodePort"
+    port: 80
+    nodePort: 30080
+
 ingress:
   enabled: true
   className: ""

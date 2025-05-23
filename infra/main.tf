@@ -141,36 +141,15 @@ resource "aws_instance" "app" {
   cat <<EOF2 > /etc/nginx/sites-available/default
   server {
     listen 80;
-    server_name ai.${var.public_domain};
-
-    # Cards API → Express (via your chart’s NodePort 30080)
-    location ~ ^/api/cards/([^/]+)(/.*)?$ {
-      rewrite ^/api/cards/([^/]+)(/.*)?$ /boards/\$1/cards\$2 break;
-      proxy_pass         http://127.0.0.1:30080;
-      proxy_http_version 1.1;
-      proxy_set_header   Host             \$host;
-      proxy_set_header   X-Real-IP        \$remote_addr;
-      proxy_set_header   X-Forwarded-For  \$proxy_add_x_forwarded_for;
-      proxy_set_header   X-Forwarded-Proto \$scheme;
-    }
-
-    # Suggest API → Frontend
-    location = /api/suggest {
-      proxy_pass         http://127.0.0.1:30080;
-      proxy_http_version 1.1;
-      proxy_set_header   Host             \$host;
-      proxy_set_header   X-Real-IP        \$remote_addr;
-      proxy_set_header   X-Forwarded-For  \$proxy_add_x_forwarded_for;
-      proxy_set_header   X-Forwarded-Proto \$scheme;
-    }
-
-    # Everything else → Frontend UI
+    server_name ${var.public_domain};
+    
+    # forward everything into the chart’s nginx on NodePort 30080
     location / {
       proxy_pass         http://127.0.0.1:30080;
       proxy_http_version 1.1;
-      proxy_set_header   Host             \$host;
-      proxy_set_header   X-Real-IP        \$remote_addr;
-      proxy_set_header   X-Forwarded-For  \$proxy_add_x_forwarded_for;
+      proxy_set_header   Host              \$host;
+      proxy_set_header   X-Real-IP         \$remote_addr;
+      proxy_set_header   X-Forwarded-For   \$proxy_add_x_forwarded_for;
       proxy_set_header   X-Forwarded-Proto \$scheme;
     }
   }

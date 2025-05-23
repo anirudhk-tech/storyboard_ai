@@ -58,6 +58,18 @@ services:
     networks:
       - app-net # Connect to the app network
 
+  nginx:
+    build:
+      context: ./nginx # Build context for the Nginx service
+      dockerfile: Dockerfile # Dockerfile for the Nginx service
+    depends_on:
+      - frontend # Wait for the kit service to be ready
+      - backend # Wait for the backend service to be ready
+    ports:
+      - "80:80" # Map port 80 on the host to port 80 in the container
+    networks:
+      - app-net # Connect to the app network
+
 volumes:
   db-data:
 

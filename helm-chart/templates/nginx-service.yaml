@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "story-board.fullname" . }}-nginx
+  labels:
+    app: {{ include "story-board.fullname" . }}-nginx
+spec:
+  type: {{ .Values.nginx.service.type }}
+  selector:
+    app: {{ include "story-board.fullname" . }}-nginx
+  ports:
+    - port: {{ .Values.nginx.service.port }}
+      targetPort: {{ .Values.nginx.service.port }}
+      nodePort: {{ .Values.nginx.service.nodePort | default "" }}
