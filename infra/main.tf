@@ -136,12 +136,12 @@ resource "aws_instance" "app" {
 
   # 4. Install host-level nginx + certbot
   apt-get update
-  DEBIAN_FRONTEND=noninteractive apt-get install -y nginx certbot python3-certbot-nginx
+  DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    nginx certbot python3-certbot-nginx
 
-  cat <<EOF2 > /etc/nginx/sites-available/default
-
+  cat <<NGINXCONF > /etc/nginx/sites-available/default
   server {
-    listen 80;
+    listen 80 default_server;
     server_name ${var.public_domain};
     
     # forward everything into the chart’s nginx on NodePort 30080
@@ -154,18 +154,22 @@ resource "aws_instance" "app" {
       proxy_set_header   X-Forwarded-Proto \$scheme;
     }
   }
-  EOF2
+  NGINXCONF
+
+  ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
   nginx -t
   systemctl reload nginx
 
   # 6. Let’s Encrypt
   certbot --nginx \
-    --non-interactive
+    --non-interactive \
     --agree-tos --redirect --hsts \
     -m anirudhkuppili@gmail.com \
     -d ${var.public_domain}
 
+  nginx -t
+  systemctl reload nginx
   exit 0
   EOF
 }
