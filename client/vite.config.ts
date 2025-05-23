@@ -10,6 +10,9 @@ export default defineConfig({
 			$lib: path.resolve('./src/lib')
 		}
 	},
+	preview: {
+		allowedHosts: ['localhost', 'ai.storyboard.website']
+	},
 	plugins: [
 		tailwindcss(),
 		sveltekit(),
