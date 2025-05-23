@@ -139,16 +139,10 @@ resource "aws_instance" "app" {
   DEBIAN_FRONTEND=noninteractive apt-get install -y nginx certbot python3-certbot-nginx
 
   cat <<EOF2 > /etc/nginx/sites-available/default
+  
   server {
-    listen 443 ssl http2;
+    listen 80;
     server_name ${var.public_domain};
-
-    ssl_certificate     /etc/letsencrypt/live/ai.storyboard.website/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/ai.storyboard.website/privkey.pem;
-    ssl_session_cache   shared:SSL:10m;
-    ssl_session_timeout 10m;
-    ssl_protocols       TLSv1.2 TLSv1.3;
-    ssl_ciphers         HIGH:!aNULL:!MD5;
     
     # forward everything into the chart’s nginx on NodePort 30080
     location / {
