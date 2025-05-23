@@ -56,9 +56,31 @@ variable "ssh_key_name" {
   type        = string
 }
 
-variable "public_dns" {
-  description = "The DNS name to use in the Ingress host"
+variable "public_domain" {
+  description = "The domain name that the website is deployed on"
   type        = string
 }
 
+variable "story_board_full_name" {
+  description = "The full name of the containers being deployed"
+  type        = string
+  default     = "storyboard"
+}
+
+variable "frontend_service_port" {
+  description = "The port that the frontend is served on"
+  type        = number
+  default     = 3000
+}
+
+variable "backend_service_port" {
+  description = "The port that the backend is served on"
+  type        = number
+  default     = 4000
+}
+
+variable "chart_version" {
+  description = "Version of helm chart"
+  type        = string
+}
 

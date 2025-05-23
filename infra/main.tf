@@ -102,47 +102,89 @@ resource "aws_instance" "app" {
   associate_public_ip_address = true
 
   user_data = <<-EOF
-    #!/usr/bin/env bash
-    set -eux
+  #!/usr/bin/env bash
+  set -eux
 
-    # Install lightweight kubernetes with default Traefik Ingress controller
-    curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="" sh -
+  # 1. Install k3s & Helm
+  curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="" sh -
+  export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+  curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-    # Set config path in EC2 instance
-    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+  # 2. Add swap
+  fallocate -l 1G /swapfile
+  chmod 600 /swapfile
+  mkswap /swapfile
+  swapon /swapfile
 
-    # Install helm
-    curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  # 3. Wait for the new chart version, then install it
+  helm repo add storyboard_ai ${var.helm_repo_url}
+  helm repo update
+  until helm search repo storyboard_ai/helm-chart --version ${var.chart_version} | grep -q ${var.chart_version}; do
+    echo "Waiting for Helm chart ${var.chart_version}…"
+    sleep 5
+    helm repo update
+  done
+  nohup helm upgrade --install ${var.helm_release_name} \
+    storyboard_ai/helm-chart \
+    --version ${var.chart_version} \
+    --namespace default \
+    --create-namespace \
+    --set frontend.env.openaiKey=${var.openai_key} \
+    --set backend.env.postgresPassword=${var.db_password} \
+    --set db.password=${var.db_password} \
+  > /var/log/helm.log 2>&1 &
 
-    # Add swap file to free up RAM in EC2 VM
-    fallocate -l 1G /swapfile
-    chmod 600 /swapfile
-    mkswap /swapfile
-    swapon /swapfile
+  # 4. Install host-level nginx + certbot
+  apt-get update
+  DEBIAN_FRONTEND=noninteractive apt-get install -y nginx certbot python3-certbot-nginx
 
-    # Install the chart named "helm-chart" in the background
-    nohup bash -c '
-      helm repo add storyboard_ai ${var.helm_repo_url}
-      helm repo update
+  cat <<EOF2 > /etc/nginx/sites-available/default
+  server {
+    listen 80;
+    server_name ai.${var.public_domain};
 
-      # Make sure to not install old chart
-      until helm search repo storyboard_ai/helm-chart --version 0.2.0 | grep 0.2.0; do
-        echo "Waiting for Helm chart 0.2.0 to appear…"
-        sleep 5
-        helm repo update
-      done
+    # Cards API → Express (via your chart’s NodePort 30080)
+    location ~ ^/api/cards/([^/]+)(/.*)?$ {
+      rewrite ^/api/cards/([^/]+)(/.*)?$ /boards/\$1/cards\$2 break;
+      proxy_pass         http://127.0.0.1:30080;
+      proxy_http_version 1.1;
+      proxy_set_header   Host             \$host;
+      proxy_set_header   X-Real-IP        \$remote_addr;
+      proxy_set_header   X-Forwarded-For  \$proxy_add_x_forwarded_for;
+      proxy_set_header   X-Forwarded-Proto \$scheme;
+    }
 
-      helm upgrade --install ${var.helm_release_name} \
-        storyboard_ai/helm-chart \
-        --version 0.2.0 \
-        --namespace default \
-        --create-namespace \
-        --set frontend.env.openaiKey="${var.openai_key}" \
-        --set backend.env.postgresPassword="${var.db_password}" \
-        --set db.password="${var.db_password}"
-      ' > /var/log/helm.log 2>&1 &
-  
-    # Early exit while chart loads for ssh access and watching logs
-    exit 0
+    # Suggest API → Frontend
+    location = /api/suggest {
+      proxy_pass         http://127.0.0.1:30080;
+      proxy_http_version 1.1;
+      proxy_set_header   Host             \$host;
+      proxy_set_header   X-Real-IP        \$remote_addr;
+      proxy_set_header   X-Forwarded-For  \$proxy_add_x_forwarded_for;
+      proxy_set_header   X-Forwarded-Proto \$scheme;
+    }
+
+    # Everything else → Frontend UI
+    location / {
+      proxy_pass         http://127.0.0.1:30080;
+      proxy_http_version 1.1;
+      proxy_set_header   Host             \$host;
+      proxy_set_header   X-Real-IP        \$remote_addr;
+      proxy_set_header   X-Forwarded-For  \$proxy_add_x_forwarded_for;
+      proxy_set_header   X-Forwarded-Proto \$scheme;
+    }
+  }
+  EOF2
+
+  nginx -t
+  systemctl reload nginx
+
+  # 6. Let’s Encrypt
+  certbot --nginx \
+    --agree-tos --redirect --hsts \
+    -m anirudhkuppili@gmail.com \
+    -d ai.${var.public_domain}
+
+  exit 0
   EOF
 }

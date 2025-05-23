@@ -10,7 +10,7 @@
 	import SaveIcon from '~icons/mdi/content-save-outline';
 	import { toggleSaveDialog } from '$lib/services/dialogServices';
 	import SaveDialog from '$lib/components/SaveDialog.svelte';
-		import { Toaster } from '$lib/components/ui/sonner';
+	import { Toaster } from '$lib/components/ui/sonner';
 
 	$: cards = $boardStore.cards;
 	$: boardSize = $boardStore.boardSize ?? { width: 1000, height: 1000 };

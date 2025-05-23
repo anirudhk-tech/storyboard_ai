@@ -6,6 +6,8 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
 
+websiteDomain: "ai.storyboard.website"
+
 db:
   user: "sb_user"
   password: "CHANGE ME"
@@ -56,14 +58,6 @@ backend:
     postgresPassword: "CHANGE ME"
     expressPort: "4000"
 
-nginx:
-  image: "anirudhktech/story-board-nginx:latest"
-  replicas: 1
-  service:
-    type: "NodePort"
-    port: 80
-    nodePort: 30080
-
 ingress:
   enabled: true
   className: ""
@@ -72,13 +66,13 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt
 
   hosts:
-    - host: ""
+    - host: ai.storyboard.website
       paths:
         - path: /
           pathType: Prefix
           servicePort: 80
 
   tls:
-    - secretName: tls-secret
+    - secretName: storyboard-tls
       hosts:
-        - storyboard.local
+        - ai.storyboard.website
