@@ -142,6 +142,21 @@ resource "aws_instance" "app" {
   server {
     listen 80;
     server_name ${var.public_domain};
+
+    # redirect all traffic to HTTPS
+    return 301 https://$host$request_uri;
+  }
+
+  server {
+    listen 443 ssl http2;
+    server_name ${var.public_domain};
+
+    ssl_certificate     /etc/letsencrypt/live/ai.storyboard.website/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/ai.storyboard.website/privkey.pem;
+    ssl_session_cache   shared:SSL:10m;
+    ssl_session_timeout 10m;
+    ssl_protocols       TLSv1.2 TLSv1.3;
+    ssl_ciphers         HIGH:!aNULL:!MD5;
     
     # forward everything into the chart’s nginx on NodePort 30080
     location / {
