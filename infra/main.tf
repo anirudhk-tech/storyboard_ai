@@ -107,21 +107,29 @@ resource "aws_instance" "app" {
     # Install helm
     curl -s https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
+    # Add swap file to free up RAM in EC2 VM
+    fallocate -l 1G /swapfile
+    chmod 600 /swapfile
+    mkswap /swapfile
+    swapon /swapfile
 
     # Install the chart named "helm-chart" in the background
     nohup bash -c '
       helm repo add storyboard_ai ${var.helm_repo_url}
       helm repo update
+
+      # Make sure to not install old chart
+      until helm search repo storyboard_ai/helm-chart --version 0.2.0 | grep 0.2.0; do
+        echo "Waiting for Helm chart 0.2.0 to appear…"
+        sleep 5
+        helm repo update
+      done
+
       helm upgrade --install ${var.helm_release_name} \
         storyboard_ai/helm-chart \
-        --version 0.1.0 \
+        --version 0.2.0 \
         --namespace default \
         --create-namespace \
-        --set ingress.enabled=true \
-        --set ingress.hosts[0].host="${var.public_dns}" \
-        --set ingress.hosts[0].paths[0].servicePort=80 \
-        --set ingress.hosts[0].paths[0].path="/" \
-        --set ingress.hosts[0].paths[0].pathType="Prefix" \
         --set frontend.env.openaiKey="${var.openai_key}" \
         --set backend.env.postgresPassword="${var.db_password}" \
         --set db.password="${var.db_password}"
