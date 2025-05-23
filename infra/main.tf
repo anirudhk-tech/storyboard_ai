@@ -138,6 +138,8 @@ resource "aws_instance" "app" {
   apt-get update
   DEBIAN_FRONTEND=noninteractive apt-get install -y nginx certbot python3-certbot-nginx
 
+  rm /etc/nginx/sites-enabled/default
+
   cat <<EOF2 > /etc/nginx/sites-available/default
   server {
     listen 80;
