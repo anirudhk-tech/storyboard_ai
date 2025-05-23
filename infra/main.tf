@@ -138,17 +138,7 @@ resource "aws_instance" "app" {
   apt-get update
   DEBIAN_FRONTEND=noninteractive apt-get install -y nginx certbot python3-certbot-nginx
 
-  rm /etc/nginx/sites-enabled/default
-
   cat <<EOF2 > /etc/nginx/sites-available/default
-  server {
-    listen 80;
-    server_name ${var.public_domain};
-
-    # redirect all traffic to HTTPS
-    return 301 https://$host$request_uri;
-  }
-
   server {
     listen 443 ssl http2;
     server_name ${var.public_domain};
